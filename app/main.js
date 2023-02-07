@@ -80,6 +80,20 @@ controls.maxDistance = 100;
 controls.rotateSpeed = panSpeed;
 controls.zoomSpeed = zoomSpeed;
 
+((function(){
+  console.log('loading...');
+  fetch('./dariust.wasm')
+  .then(response => response.arrayBuffer())
+  .then(bytes => WebAssembly.instantiate(bytes, {}))
+  .then(wasmContainer => {
+    const {mercator} = wasmContainer.instance.exports;
+    // console.log('4 + 2 = ', add(4, 2));
+    // console.log('4 - 2 = ', subtract(4, 2));
+    // console.log('4 * 2 = ', multiply(4, 2));
+    console.log(mercator('Normal.jpg'));
+  }).catch(err=>console.log(err));
+})())
+
 function animate() {
   requestAnimationFrame( animate );
 
