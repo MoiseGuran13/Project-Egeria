@@ -1,10 +1,10 @@
-import React, {Suspense, useEffect, useRef, useState} from "react";
+import React, {Suspense, useEffect, useMemo, useRef, useState} from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
 import "./index.css";
 import { BoxGeometry } from "three";
 
-function WireframeGlobe(){
+export function WireframeGlobe(vertices?: string) {
   const sphere = useRef<THREE.Mesh>(null!)
   const [isRevolving, startRevolving] = useState(true)
   const [rotationSpeed, setRevolutionSpeed] = useState(0.1)
@@ -28,14 +28,29 @@ function WireframeGlobe(){
     document.addEventListener("keypress", handle)
   })
 
-  // Memoize the geometry
+  if (typeof vertices == 'undefined'){
+    return(
+      <mesh ref={sphere} rotation={[0, 0, -0.41]} position={[0, 0, 0]}>
+        <sphereGeometry args={[15, 20]} />
+        <meshBasicMaterial wireframe={true} color={"red"} />
+      </mesh>
+    )
+  }
+  else{
+    return(
+      <mesh ref={sphere} rotation={[0, 0, -0.41]} position={[0, 0, 0]}>
+        <sphereGeometry args={[15, 20]} />
+        <meshBasicMaterial wireframe={true} color={vertices} />
+      </mesh>
+    )
+  }
   
-  return(
-    <mesh ref={sphere} rotation={[0, 0, -0.41]} position={[0, 0, 0]}>
-      <sphereGeometry args={[15, 20]} />
-      <meshBasicMaterial wireframe={true} color={"red"} />
-    </mesh>
-  )
+  // Memoize the geometry
+  // const geometry = <sphereGeometry args={[15, 20]} />;
+    
+  // })
+  
+
 }
 
 
@@ -46,7 +61,7 @@ function ShowGlobe(){
 
       <PerspectiveCamera makeDefault fov={50} position={[0, 30, 50]}/>
 
-      <WireframeGlobe />
+      <WireframeGlobe vertices={"yellow"}/>
     </>
   )
 }
