@@ -31,8 +31,6 @@ export function Globe() {
       document.addEventListener("keypress", handle)
     })
   
-    
-
     return useMemo(() => {
         return(
         <mesh ref={sphere} rotation={[0, 0, -0.41]} position={[0, 0, 0]}>
