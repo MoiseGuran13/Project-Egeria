@@ -16,46 +16,35 @@ export function Globe() {
     useEffect(() => {
       function handle(event: any){
         switch (event.key){
-          case " ":
+          case " ":{
             if(isRevolving) 
               startRevolving(false)
             else
               startRevolving(true)
-          case "f":
+            }
+          case "f":{
             console.log(path)
+          }
         }
       }
   
       document.addEventListener("keypress", handle)
     })
   
-    let result: JSX.Element
-    if (typeof path == 'string'){
-      result = useMemo(() =>{
-        // console.log("Expensed")
-        return <mesh ref={sphere} rotation={[0, 0, -0.41]} position={[0, 0, 0]}>
+    return useMemo(() => {
+      if (typeof path == 'string'){
+        return(
+        <mesh ref={sphere} rotation={[0, 0, -0.41]} position={[0, 0, 0]}>
           <sphereGeometry args={[15, 20]} />
           <meshBasicMaterial wireframe={true} color={path} />
-        </mesh>
-      }, path)
-      
-    }else{
-      // console.log("Ooops")
-      result = 
+        </mesh>)
+      }else{
+        return(
         <mesh ref={sphere} rotation={[0, 0, -0.41]} position={[0, 0, 0]}>
           <sphereGeometry args={[15, 20]} />
           <meshBasicMaterial wireframe={true} color={"red"} />
-        </mesh>
-    }
-  
-    return result
-    
-    // Memoize the geometry
-    // const geometry = <sphereGeometry args={[15, 20]} />;
-      
-    // })
-    
-  
+        </mesh>)}
+    }, path)
   }
 
   export default Globe;
