@@ -1,4 +1,4 @@
-import React, { Suspense, useContext, useEffect, useState } from "react";
+import { Suspense, useContext, useEffect, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
 import "./index.css";
@@ -6,6 +6,7 @@ import "./index.css";
 // import { updateCamera } from "@react-three/fiber/dist/declarations/src/core/utils";
 import GlobeContext from "./GlobeContext";
 import Globe, { WireframeGlobe } from "./Globe";
+import Background from "./Background.png"
 
 function ShowGlobe(){
   const {path, setPath} = useContext(GlobeContext)
@@ -20,15 +21,19 @@ function ShowGlobe(){
     document.addEventListener("keypress", handle)
   })
   
+  // console.log(require('./assets/Background.png'))
    return (
     <>
+      <div>
+        <img src={Background} alt={"Background"}/>
+      </div>
+      
       <OrbitControls target={[0, 0.35, 0]} maxPolarAngle={1.45}/>
 
       <PerspectiveCamera makeDefault fov={50} position={[0, 30, 50]}/>
 
-      <Suspense fallback={<WireframeGlobe/>}>
-        <Globe />
-      </Suspense>
+
+      <WireframeGlobe />
     </>
   )
 }
