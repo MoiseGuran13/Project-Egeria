@@ -5,7 +5,7 @@ import "./index.css";
 // import { BoxGeometry } from "three";
 // import { updateCamera } from "@react-three/fiber/dist/declarations/src/core/utils";
 import GlobeContext from "./GlobeContext";
-import Globe from "./Globe";
+import Globe, { WireframeGlobe } from "./Globe";
 
 function ShowGlobe(){
   const {path, setPath} = useContext(GlobeContext)
@@ -26,7 +26,9 @@ function ShowGlobe(){
 
       <PerspectiveCamera makeDefault fov={50} position={[0, 30, 50]}/>
 
-      <Globe />
+      <Suspense fallback={<WireframeGlobe/>}>
+        <Globe />
+      </Suspense>
     </>
   )
 }

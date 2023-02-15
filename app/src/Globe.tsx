@@ -31,20 +31,47 @@ export function Globe() {
       document.addEventListener("keypress", handle)
     })
   
+    
+
     return useMemo(() => {
-      if (typeof path == 'string'){
         return(
         <mesh ref={sphere} rotation={[0, 0, -0.41]} position={[0, 0, 0]}>
           <sphereGeometry args={[15, 20]} />
           <meshBasicMaterial wireframe={true} color={path} />
         </mesh>)
-      }else{
-        return(
-        <mesh ref={sphere} rotation={[0, 0, -0.41]} position={[0, 0, 0]}>
-          <sphereGeometry args={[15, 20]} />
-          <meshBasicMaterial wireframe={true} color={"red"} />
-        </mesh>)}
-    }, path)
+      }, path)
+  }
+
+  export function WireframeGlobe(){
+    const sphere = useRef<THREE.Mesh>(null!)
+    const [isRevolving, startRevolving] = useState(true)
+    const [rotationSpeed, setRevolutionSpeed] = useState(0.1)
+
+    useFrame((state, delta) => {
+      if (isRevolving)
+        sphere.current.rotateY(rotationSpeed * delta)
+    })
+  
+    useEffect(() => {
+      function handle(event: any){
+        switch (event.key){
+          case " ":{
+            if(isRevolving) 
+              startRevolving(false)
+            else
+              startRevolving(true)
+            }
+        }
+      }
+  
+      document.addEventListener("keypress", handle)
+    })
+
+    return(
+      <mesh ref={sphere} rotation={[0, 0, -0.41]} position={[0, 0, 0]}>
+        <sphereGeometry args={[15, 20]} />
+        <meshBasicMaterial wireframe={true} color={"red"} />
+      </mesh>)
   }
 
   export default Globe;
