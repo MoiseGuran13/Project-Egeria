@@ -29,7 +29,7 @@ function ShowGlobe(){
   
   return (
     <>
-      <OrbitControls target={[0, 0.35, 0]} maxPolarAngle={1.45}/>
+      <OrbitControls target={[0, 0.35, 0]} maxPolarAngle={10} maxDistance={100} minDistance={16}/>
 
       <PerspectiveCamera ref={camera} makeDefault fov={50} position={position}/>
 
