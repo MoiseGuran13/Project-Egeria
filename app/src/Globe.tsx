@@ -11,7 +11,7 @@ export function Globe() {
     const [isRevolving, startRevolving] = useState(true)
     const [rotationSpeed, setRevolutionSpeed] = useState(0.1)
     
-    useFrame((state, delta) => {
+    useFrame((_, delta) => {
       if (isRevolving)
         sphere.current.rotateY(rotationSpeed * delta)
     })
@@ -40,36 +40,36 @@ export function Globe() {
       }, path)
   }
 
-  export function WireframeGlobe(){
-    const sphere = useRef<THREE.Mesh>(null!)
-    const [isRevolving, startRevolving] = useState(true)
-    const [rotationSpeed, setRevolutionSpeed] = useState(0.1)
+export function WireframeGlobe(){
+  const sphere = useRef<THREE.Mesh>(null!)
+  const [isRevolving, startRevolving] = useState(true)
+  const rotationSpeed = 0.1
 
-    useFrame((state, delta) => {
-      if (isRevolving)
-        sphere.current.rotateY(rotationSpeed * delta)
-    })
+  useFrame((_, delta) => {
+    if (isRevolving)
+      sphere.current.rotateY(rotationSpeed * delta)
+  })
   
-    useEffect(() => {
-      function handle(event: any){
-        switch (event.key){
-          case " ":{
-            if(isRevolving) 
-              startRevolving(false)
-            else
-              startRevolving(true)
-            }
-        }
+  useEffect(() => {
+    function handle(event: any){
+      switch (event.key){
+        case " ":{
+          if(isRevolving) 
+            startRevolving(false)
+          else
+            startRevolving(true)
+          }
       }
+    }
   
-      document.addEventListener("keypress", handle)
-    })
+    document.addEventListener("keypress", handle)
+  })
 
-    return(
-      <mesh ref={sphere} rotation={[0, 0, -0.41]} position={[0, 0, 0]}>
-        <sphereGeometry args={[15, 20]} />
-        <meshBasicMaterial wireframe={true} color={"red"}/>
-      </mesh>)
-  }
+  return(
+    <mesh ref={sphere} rotation={[0, 0, -0.41]} position={[0, 0, 0]}>
+      <sphereGeometry args={[15, 20]} />
+      <meshBasicMaterial wireframe={true} color={"red"}/>
+    </mesh>)
+}
 
-  export default Globe;
+export default Globe;

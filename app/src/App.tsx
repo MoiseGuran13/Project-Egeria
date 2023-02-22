@@ -4,7 +4,7 @@ import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
 import "./index.css";
 import GlobeContext from "./GlobeContext";
 import Globe, { WireframeGlobe } from "./Globe";
-import { AmbientLight } from "three";
+// import { AmbientLight } from "three";
 
 function ShowGlobe(){
   const {path, setPath} = useContext(GlobeContext)
