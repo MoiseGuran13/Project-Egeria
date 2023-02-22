@@ -1,6 +1,9 @@
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useLoader } from "@react-three/fiber";
 import GlobeContext from "./GlobeContext"
+import texture from "./../public/Albedo-diffuse.jpg"
+import normal from "./../public/Normal.jpg"
+import { TextureLoader } from "three";
 
 export function Globe() {
     const {path, setPath} = useContext(GlobeContext)
@@ -22,9 +25,6 @@ export function Globe() {
             else
               startRevolving(true)
             }
-          case "f":{
-            console.log(path)
-          }
         }
       }
   
@@ -35,7 +35,7 @@ export function Globe() {
         return(
         <mesh ref={sphere} rotation={[0, 0, -0.41]} position={[0, 0, 0]}>
           <sphereGeometry args={[15, 20]} />
-          <meshBasicMaterial wireframe={true} color={path} />
+          <meshStandardMaterial color={path} map={useLoader(TextureLoader, texture)} bumpMap={useLoader(TextureLoader, normal)}/>
         </mesh>)
       }, path)
   }
@@ -68,7 +68,7 @@ export function Globe() {
     return(
       <mesh ref={sphere} rotation={[0, 0, -0.41]} position={[0, 0, 0]}>
         <sphereGeometry args={[15, 20]} />
-        <meshBasicMaterial wireframe={true} color={"red"} />
+        <meshBasicMaterial wireframe={true} color={"red"}/>
       </mesh>)
   }
 
