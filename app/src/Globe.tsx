@@ -1,8 +1,8 @@
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useFrame, useLoader } from "@react-three/fiber";
 import GlobeContext from "./GlobeContext"
-import texture from "./../public/Albedo-diffuse.jpg"
-import normal from "./../public/Normal.jpg"
+import texture from "./assets/Albedo-diffuse.jpg"
+import normal from "./assets/Normal.jpg"
 import { TextureLoader } from "three";
 
 export function Globe() {
