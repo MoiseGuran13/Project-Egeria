@@ -1,6 +1,7 @@
 use std::f64::consts::PI;
 use std::convert::TryInto;
 use image::GenericImageView;
+use wasm::bindgen::prelude::*;
 
 #[no_mangle]
 fn coord_to_angle(coord: f64, max_coord: f64) -> f64 {
@@ -126,7 +127,7 @@ fn draw_up_model(verts: Vec<[f64; 3]>, width: usize, height: usize) -> Vec<f64> 
     return edges;
 }
 
-#[no_mangle]
+#[wasm_bindgen]
 pub fn solve_mercator(path: &str) -> Vec<f64> {
     let img = image::open(path).unwrap();
     let (w, h) = img.dimensions();

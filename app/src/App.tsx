@@ -17,16 +17,18 @@ function ShowGlobe(){
       switch (event.key){
         case "r" :{
           setPosition(new Vector3(0, 30, 50))
+          break;
        }
-       case "R" :{
-        setPosition(new Vector3(0, 30, 50))
+        case "R" :{
+          setPosition(new Vector3(0, 30, 50))
+          break;
        }
       }
     }
 
     document.addEventListener("keypress", handle)
   })
-  
+
   return (
     <>
       <OrbitControls target={[0, 0.35, 0]} maxPolarAngle={10} maxDistance={100} minDistance={16}/>
@@ -48,7 +50,9 @@ function ShowGlobe(){
 
 
 function App(){
-  const [path, setPath] = useState(undefined)
+  const [path, setPath] = useState("white")
+
+  
 
   return (
     <Suspense fallback={<div>Loading...</div>}>

@@ -6,13 +6,15 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "build:wasm": "cd wasm-lib && wasm-pack build --target web --out-dir pkg",
     "preview": "vite preview"
   },
   "dependencies": {
     "@react-three/drei": "^9.56.25",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "three": "^0.149.0"
+    "three": "^0.149.0",
+    "wasm-lib": "file:wasm-lib/pkg"
   },
   "devDependencies": {
     "@types/react": "^18.0.26",
