@@ -4,7 +4,7 @@ import GlobeContext from "./GlobeContext"
 import texture from "./assets/Albedo-diffuse.jpg"
 import normal from "./assets/Normal.jpg"
 import { TextureLoader } from "three";
-import init, { solve_mercator } from "wasm-lib";
+import init, {try_path} from "wasm-lib"
 
 export function Globe() {
     const {path, setPath} = useContext(GlobeContext)
@@ -12,12 +12,16 @@ export function Globe() {
     const [isRevolving, startRevolving] = useState(true)
     const [rotationSpeed, setRevolutionSpeed] = useState(0.1)
     
-    const [ans, setAns] = useState<Float64Array>();
-      useMemo(() => {
+
+    
+    const [ans, setAns] = useState<String>();
+      useEffect(() => {
         init().then(() => {
-          setAns(solve_mercator(normal));
-      })
-      }, [normal])
+          setAns(try_path(normal));        
+          // console.log(ans);
+
+        })
+      }, [])
 
     useFrame((_, delta) => {
       if (isRevolving)
@@ -28,13 +32,15 @@ export function Globe() {
       function handle(event: any){
         switch (event.key){
           case " ":{
-            if(isRevolving) 
-              startRevolving(false)
-            else
-              startRevolving(true)
-            }
-            console.log(ans)
+            if(isRevolving) {
+              startRevolving(false)}
+            else{
+              startRevolving(true)}
+  
+
+            console.log(ans)  
             break;
+            }
         }
       }
   
@@ -42,8 +48,8 @@ export function Globe() {
     })
   
     const mesh = useMemo(() => {
-        console.log(normal)
-        console.log(ans)
+        // console.log(normal)
+        // console.log(ans)
         return(
         <mesh ref={sphere} rotation={[0, 0, -0.41]} position={[0, 0, 0]}>
           <sphereGeometry args={[15, 20]} />
@@ -67,10 +73,12 @@ export function WireframeGlobe(){
     function handle(event: any){
       switch (event.key){
         case " ":{
-          if(isRevolving) 
-            startRevolving(false)
-          else
-            startRevolving(true)
+          if(isRevolving) {
+            startRevolving(false)}
+          else{
+            startRevolving(true)}
+
+          break;
           }
       }
     }
