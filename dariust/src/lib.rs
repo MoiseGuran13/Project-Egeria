@@ -1,9 +1,11 @@
 use std::f64::consts::PI;
 use std::convert::TryInto;
-use image::GenericImageView;
-use wasm::bindgen::prelude::*;
+// use image::GenericImageView;
+use wasm_bindgen::prelude::*;
+// use js_sys::JsString;
+use js_sys::Number;
+use js_sys::Float64Array;   
 
-#[no_mangle]
 fn coord_to_angle(coord: f64, max_coord: f64) -> f64 {
     return ((coord/max_coord) -0.5) * PI;
     // return ((2 * coord / max_coord) as f64 - 1.0) * 2.0 * PI;
@@ -19,19 +21,17 @@ fn coord_to_angle(coord: f64, max_coord: f64) -> f64 {
 //     println!("x:{}; y:{}; z:{};     L:{}", vec3[0], vec3[1], vec3[2], lengthofvec3(vec3));
 // }
 
-#[no_mangle]
 fn copy_onto_vector(vector: &mut Vec<f64>, vec3: [f64; 3]) {
     vector.push(vec3[0]);
     vector.push(vec3[1]);
     vector.push(vec3[2]);
 }
 
-#[no_mangle]
-fn image_to_vetices(path: &str) -> Vec<[f64; 3]>{
+fn image_to_vetices(pixels: Vec<f64>, w: usize, h: usize) -> Vec<[f64; 3]>{
     const RADIUS: f64 = 10.0;
 
-    let img = image::open(path).unwrap();
-    let (w, h) = img.dimensions();
+    // let img = image::open(path).unwrap();
+    // let (w, h) = img.dimensions();
     let width = w as i32;
     let height = h as i32; 
     // println!("{}", width);    
@@ -39,14 +39,14 @@ fn image_to_vetices(path: &str) -> Vec<[f64; 3]>{
     let mut verts = Vec::with_capacity((width * height).try_into().unwrap());
     let mut coords: [f64; 3] = [0.0, 0.0, 1.0];
 
-    verts.push([0.0, RADIUS + (img.get_pixel(0, 0)[0] as f64/51.0), 0.0]);
+    verts.push([0.0, RADIUS + (pixels[0] as f64/51.0), 0.0]);
 
     for y in 1..height-1{
         let alpha = coord_to_angle(y as f64, height as f64 - 1.0); 
 
         for x in 0..width{
-            let pix = img.get_pixel(x as u32, y as u32);
-            let altitude = RADIUS + (pix[0] as f64/51.0); 
+            // let pix = img.get_pixel(x as u32, y as u32);
+            let altitude = RADIUS + (pixels[x as usize + y as usize * w] as f64/51.0); 
             let beta = coord_to_angle(x as f64, width as f64  - 1.0); 
 
             coords[0] = alpha.cos() * beta.sin() * altitude;
@@ -57,7 +57,7 @@ fn image_to_vetices(path: &str) -> Vec<[f64; 3]>{
         }
     }
 
-    verts.push([0.0, -RADIUS - (img.get_pixel(w-1, h-1)[0] as f64/51.0), 0.0]);
+    verts.push([0.0, -RADIUS - (pixels[w*h-1] as f64/51.0), 0.0]);
 
     // printvec3(verts[0]);
     // printvec3(verts[1]);
@@ -80,7 +80,6 @@ fn image_to_vetices(path: &str) -> Vec<[f64; 3]>{
     return verts;
 }
 
-#[no_mangle]
 fn draw_up_model(verts: Vec<[f64; 3]>, width: usize, height: usize) -> Vec<f64> {
     let mut edges = Vec::<f64>::with_capacity((width * (height - 2) * 18).try_into().unwrap());
     // let len = verts.len();
@@ -128,12 +127,35 @@ fn draw_up_model(verts: Vec<[f64; 3]>, width: usize, height: usize) -> Vec<f64> 
 }
 
 #[wasm_bindgen]
-pub fn solve_mercator(path: &str) -> Vec<f64> {
-    let img = image::open(path).unwrap();
-    let (w, h) = img.dimensions();
-    let width = w as usize;
-    let height = h as usize; 
+pub fn try_path(pixels: Float64Array, w: Number, h: Number) -> Number {
+    // let img = image::open(path).unwrap();
+    // let (w, h) = img.dimensions();
+    let width = <Number as Into<f64>>::into(w) as usize;
+    let height = <Number as Into<f64>>::into(h) as usize; 
 
-    let vertices = image_to_vetices(path);
-    return draw_up_model(vertices, width, height);
-}
+    return Number::from((pixels.to_vec().len()/(width*height-1)) as i32);
+
+    // let vertices = image_to_vetices(pixels.to_vec(), width, height);
+    // return draw_up_model(vertices, width, height);
+}   
+
+
+#[wasm_bindgen]
+pub unsafe fn solve_mercator(pixels: Float64Array, w: Number, h: Number) -> Float64Array {
+    // let img = image::open(path).unwrap();
+    // let (w, h) = img.dimensions();
+    let width = <Number as Into<f64>>::into(w) as usize;
+    let height = <Number as Into<f64>>::into(h) as usize; 
+
+    let vertices = image_to_vetices(pixels.to_vec(), width, height);
+    return Float64Array::view(&draw_up_model(vertices, width, height));
+}   
+
+// #[test]
+// fn path_test() {
+//     let jspath: JsString = JsString::from("/Project-Egeria/app/src/assets/Normal.jpg");
+//     let path: &str = &(<JsString as Into<String>>::into(jspath))[..];
+//     let img = image::open(path).unwrap();
+//     let (w, _) = img.dimensions();
+//     println!("{}", w);
+// }

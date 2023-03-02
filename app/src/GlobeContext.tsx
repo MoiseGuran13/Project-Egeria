@@ -1,9 +1,12 @@
 import { createContext } from "react";
+import normal from "./assets/Normal.jpg"
 
-let globePath: string = "undefined";
+let globeShape = new Image();
+globeShape.src = normal;
+
 const GlobeContext = createContext({
-  path: globePath,
-  setPath: (newPath: any) => {},
+  shape: globeShape,
+  setShape: (newPath: any) => {},
 });
 
 export default GlobeContext;

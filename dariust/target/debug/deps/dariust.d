@@ -1,5 +1,5 @@
-C:\Users\Work\Desktop\GitHub\Project-Egeria\dariust\target\debug\deps\dariust.exe: src\main.rs
+C:\Users\Work\Desktop\GitHub\Project-Egeria\dariust\target\debug\deps\dariust.dll: src\lib.rs
 
-C:\Users\Work\Desktop\GitHub\Project-Egeria\dariust\target\debug\deps\dariust.d: src\main.rs
+C:\Users\Work\Desktop\GitHub\Project-Egeria\dariust\target\debug\deps\dariust.d: src\lib.rs
 
-src\main.rs:
+src\lib.rs:

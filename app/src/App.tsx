@@ -5,12 +5,15 @@ import "./index.css";
 import GlobeContext from "./GlobeContext";
 import Globe, { WireframeGlobe } from "./Globe";
 import { Vector3 } from "three";
+import normal from "./assets/Normal.jpg"
+
 // import { AmbientLight } from "three";
 
 function ShowGlobe(){
-  const {path, setPath} = useContext(GlobeContext)
+  const {shape, setShape} = useContext(GlobeContext)
   const camera = useRef<any>(null!)
   const [position, setPosition] = useState<Vector3|undefined>(new Vector3(0, 30, 50))
+
 
   useEffect(() => {
     function handle(event: any){
@@ -50,13 +53,15 @@ function ShowGlobe(){
 
 
 function App(){
-  const [path, setPath] = useState("white")
-
+  // const [path, setPath] = useState("white")
+  const defaultShape = new Image()
+  defaultShape.src = normal
+  const [shape, setShape] = useState(defaultShape)
   
 
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <GlobeContext.Provider value={{path, setPath}}>
+      <GlobeContext.Provider value={{shape, setShape}}>
           <Canvas>
             <ShowGlobe />
           </Canvas>
