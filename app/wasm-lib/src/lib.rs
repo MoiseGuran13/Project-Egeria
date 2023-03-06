@@ -36,28 +36,26 @@ fn image_to_vetices(pixels: Vec<f64>, w: usize, h: usize) -> Vec<[f64; 3]>{
     let height = h as i32; 
     // println!("{}", width);    
     // println!("{}", height);
-    let mut verts = Vec::with_capacity((width * height).try_into().unwrap());
-    let mut coords: [f64; 3] = [0.0, 0.0, 1.0];
+    let mut verts = Vec::with_capacity((2 + (height-2) * width).try_into().unwrap());
+    // let mut coords: [f64; 3] = [0.0, 0.0, 1.0];
 
-    verts.push([0.0, RADIUS + (pixels[0] as f64/51.0), 0.0]);
+    verts.push([0.0, RADIUS + (pixels[0] as f64 * 5.0), 0.0]);
 
     for y in 1..height-1{
         let alpha = coord_to_angle(y as f64, height as f64 - 1.0); 
 
         for x in 0..width{
             // let pix = img.get_pixel(x as u32, y as u32);
-            let altitude = RADIUS + (pixels[x as usize + y as usize * w] as f64/51.0); 
+            let altitude = RADIUS + (pixels[x as usize + y as usize * w] as f64 * 5.0); 
             let beta = coord_to_angle(x as f64, width as f64  - 1.0); 
 
-            coords[0] = alpha.cos() * beta.sin() * altitude;
-            coords[1] = -alpha.sin() * altitude;
-            coords[2] = alpha.cos() * beta.cos() * altitude;
-
-            verts.push(coords);
+            verts.push([alpha.cos() * beta.sin() * altitude,
+                        -alpha.sin() * altitude,
+                        alpha.cos() * beta.cos() * altitude]);
         }
     }
 
-    verts.push([0.0, -RADIUS - (pixels[w*h-1] as f64/51.0), 0.0]);
+    verts.push([0.0, -RADIUS - (pixels[w * h - 1] as f64 * 5.0), 0.0]);
 
     // printvec3(verts[0]);
     // printvec3(verts[1]);
@@ -80,20 +78,21 @@ fn image_to_vetices(pixels: Vec<f64>, w: usize, h: usize) -> Vec<[f64; 3]>{
     return verts;
 }
 
-fn resize(verts: Vec<[f64; 3]>) -> Vec<f64> {
-    let mut edges: Vec<f64> = Vec::new();
-    for i in 0..verts.len() {
-        copy_onto_vector(&mut edges, verts[i]);
-    }
+// fn resize(verts: Vec<[f64; 3]>) -> Vec<f64> {
+//     let mut edges: Vec<f64> = Vec::new();
+//     for i in 0..verts.len() {
+//         copy_onto_vector(&mut edges, verts[i]);
+//     }
 
-    return edges;
-}
+//     return edges;
+// }
 
 fn draw_up_model(verts: Vec<[f64; 3]>, width: usize, height: usize) -> Vec<f64> {
-    let mut edges = Vec::<f64>::with_capacity((6*height*(width-1) + 6).try_into().unwrap());
+    let mut edges = Vec::<f64>::with_capacity((18 * width * (height - 2)).try_into().unwrap());
     // let len = verts.len();
     let spole = width * height - 2 * width + 1;
 
+    // 6w - 6 appends
     for c in 1..width {
         copy_onto_vector(&mut edges, verts[0]);
         copy_onto_vector(&mut edges, verts[c]);
@@ -104,16 +103,22 @@ fn draw_up_model(verts: Vec<[f64; 3]>, width: usize, height: usize) -> Vec<f64> 
         copy_onto_vector(&mut edges, verts[spole - c - 1]);
     }
 
+    // 3 appends
     copy_onto_vector(&mut edges, verts[0]);
     copy_onto_vector(&mut edges, verts[width]);
     copy_onto_vector(&mut edges, verts[1]);
 
+    // 3 more appends
     copy_onto_vector(&mut edges, verts[spole]);
     copy_onto_vector(&mut edges, verts[spole - width]);
     copy_onto_vector(&mut edges, verts[spole - 1]);
 
-    for y in 1..(height-3){
+    // (h - 3) * 6w appends 
+    for y in 0..(height-3){
+        // from  1  to  1 + w * (h-4)
         let cedge = 1 + width * y;
+
+        // 6 appends
         copy_onto_vector(&mut edges, verts[cedge]);
         copy_onto_vector(&mut edges, verts[cedge + width - 1]);
         copy_onto_vector(&mut edges, verts[cedge + 2 * width - 1]);
@@ -121,17 +126,22 @@ fn draw_up_model(verts: Vec<[f64; 3]>, width: usize, height: usize) -> Vec<f64> 
         copy_onto_vector(&mut edges, verts[cedge + width]);
         copy_onto_vector(&mut edges, verts[cedge]);
         
+        // 6w - 6 appends
         for x in 1..width{
+            // from 2 + y * w  to  w * (y + 1)
+            // at extreme w * (h - 3)
             let corner = 1 + x + y * width;
             copy_onto_vector(&mut edges, verts[corner]);
             copy_onto_vector(&mut edges, verts[corner - 1]);
             copy_onto_vector(&mut edges, verts[corner - 1 + width]);
             copy_onto_vector(&mut edges, verts[corner - 1 + width]);
-            copy_onto_vector(&mut edges, verts[corner + width]);
+            copy_onto_vector(&mut edges, verts[corner + width]);    // at most w * (h - 2)
             copy_onto_vector(&mut edges, verts[corner]);
         }
     }
 
+    // total 6w * (h - 2) appends of 3 coords each
+    // edges has 18 * w * (h - 2) floats
     return edges;
 }
 
@@ -160,8 +170,14 @@ pub unsafe fn solve_mercator(pixels: Float64Array, w: Number, h: Number) -> Floa
 
     let vertices = image_to_vetices(pixels.to_vec(), width, height);
     // let arr = resize(vertices);
-    let mut model = draw_up_model(vertices, width, height);
-    return Float64Array::view(&model);
+    let model = draw_up_model(vertices, width, height);
+    let jsmodel = Float64Array::view(&model);
+    if model.len() as u32 == jsmodel.length() {
+        return jsmodel;
+    }
+    else {
+        return Float64Array::new_with_length(1);
+    }
 }   
 
 // #[test]

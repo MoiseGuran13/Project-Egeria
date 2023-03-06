@@ -5,6 +5,7 @@ import "./index.css";
 import GlobeContext from "./GlobeContext";
 import Globe, { WireframeGlobe } from "./Globe";
 import { Vector3 } from "three";
+import init, {solve_mercator, try_path} from "wasm-lib";
 import normal from "./assets/Normal.jpg"
 
 // import { AmbientLight } from "three";
@@ -32,6 +33,8 @@ function ShowGlobe(){
     document.addEventListener("keypress", handle)
   })
 
+  // console.log(solve_mercator);
+
   return (
     <>
       <OrbitControls target={[0, 0.35, 0]} maxPolarAngle={10} maxDistance={100} minDistance={16}/>
@@ -44,7 +47,7 @@ function ShowGlobe(){
 
       <Suspense fallback={<WireframeGlobe />}>
 
-        <Globe />
+        <Globe solve_mercator={solve_mercator} />
       
       </Suspense>
     </>
@@ -57,17 +60,23 @@ function App(){
   const defaultShape = new Image()
   defaultShape.src = normal
   const [shape, setShape] = useState(defaultShape)
-  
+  const [result, setResult] = useState(<div>Loading...</div>)
 
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
+  useEffect(() => {
+    init().then(() => {
+      setResult(
+        <Suspense fallback={<div>Loading...</div>}>
       <GlobeContext.Provider value={{shape, setShape}}>
           <Canvas>
-            <ShowGlobe />
+            <ShowGlobe/>
           </Canvas>
       </GlobeContext.Provider>
     </Suspense>
-  )
+      )
+    })
+  })
+
+  return result;
 }
 
 export default App;
